@@ -40,7 +40,9 @@ var sound_enabled: bool = true
 var last_move_pos: Vector2i = Vector2i(-1, -1)
 
 var _stick_cooldown: float = 0.0
-const STICK_REPEAT_DELAY: float = 0.22
+var _stick_held: bool = false
+const STICK_INITIAL_DELAY: float = 0.32
+const STICK_REPEAT_DELAY: float = 0.18
 
 func _ready() -> void:
 	board_view.set_sound_manager(sound_manager)
@@ -70,23 +72,39 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if state != State.WAITING_INPUT or not _is_human_turn():
+		_stick_held = false
+		_stick_cooldown = 0.0
 		return
 	
-	# Analog stick continuous navigation
+	# Analog stick continuous navigation (Axis 0: Left X, Axis 1: Left Y)
+	var joy_x: float = Input.get_joy_axis(0, JOY_AXIS_LEFT_X)
+	var joy_y: float = Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)
+	var stick_len: float = Vector2(joy_x, joy_y).length()
+	
+	if stick_len < 0.30:
+		# Returned to neutral -> reset cooldown instantly for snappy response
+		_stick_held = false
+		_stick_cooldown = 0.0
+		return
+	
 	if _stick_cooldown > 0.0:
 		_stick_cooldown -= delta
-	else:
-		var stick_vec: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-		if stick_vec.length() > 0.5:
-			var dir := Vector2i.ZERO
-			if absf(stick_vec.x) > absf(stick_vec.y):
-				dir.x = 1 if stick_vec.x > 0 else -1
+		return
+	
+	if stick_len >= 0.45:
+		var dir := Vector2i.ZERO
+		if absf(joy_x) > absf(joy_y):
+			dir.x = 1 if joy_x > 0 else -1
+		else:
+			dir.y = 1 if joy_y > 0 else -1
+		
+		if dir != Vector2i.ZERO:
+			board_view.move_cursor(dir)
+			sound_manager.play_click()
+			if not _stick_held:
+				_stick_held = true
+				_stick_cooldown = STICK_INITIAL_DELAY
 			else:
-				dir.y = 1 if stick_vec.y > 0 else -1
-			
-			if dir != Vector2i.ZERO:
-				board_view.move_cursor(dir)
-				sound_manager.play_click()
 				_stick_cooldown = STICK_REPEAT_DELAY
 
 func _input(event: InputEvent) -> void:
@@ -109,7 +127,11 @@ func _input(event: InputEvent) -> void:
 		_on_undo_pressed()
 		return
 	
-	# 2. Board D-pad cursor movement (Discrete button presses for instant response)
+	# 2. Board D-pad / Keyboard cursor movement (Strict single-press, ignore motion events)
+	if event is InputEventJoypadMotion:
+		# Handled in _process to avoid double-triggers
+		return
+	
 	var move_dir := Vector2i.ZERO
 	if event.is_action_pressed("move_left") or event.is_action_pressed("ui_left"):
 		move_dir.x -= 1
@@ -124,6 +146,7 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		board_view.move_cursor(move_dir)
 		sound_manager.play_click()
+		_stick_cooldown = STICK_INITIAL_DELAY
 		return
 	
 	# 3. Main Action A button (Place piece)
