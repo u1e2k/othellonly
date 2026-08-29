@@ -181,23 +181,14 @@ layout_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Btn1PBlack" type="Button" parent="CenterContainer/VBox/MainMenuVBox"]
-layout_mode = 2
-focus_mode = 2
-theme_override_font_sizes/font_size = 15
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_accent")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-text = "● 1P vs CPU (黒・先手で対局)"
-
-[node name="Btn1PWhite" type="Button" parent="CenterContainer/VBox/MainMenuVBox"]
+[node name="Btn1P" type="Button" parent="CenterContainer/VBox/MainMenuVBox"]
 layout_mode = 2
 focus_mode = 2
 theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_primary")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-text = "○ 1P vs CPU (白・後手で対局)"
+text = "👤 1P vs CPU (ひとりで対局)"
 
 [node name="Btn2P" type="Button" parent="CenterContainer/VBox/MainMenuVBox"]
 layout_mode = 2
@@ -225,6 +216,59 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_btn_primary")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "⚙ 設定 (効果音・ガイド)"
+
+[node name="ColorModal" type="PanelContainer" parent="CenterContainer/VBox"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel_modal")
+
+[node name="Margin" type="MarginContainer" parent="CenterContainer/VBox/ColorModal"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/VBox/ColorModal/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ColorTitleLabel" type="Label" parent="CenterContainer/VBox/ColorModal/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "1P vs CPU - 手番を選択してください"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/VBox/ColorModal/Margin/VBox"]
+layout_mode = 2
+
+[node name="BtnColorBlack" type="Button" parent="CenterContainer/VBox/ColorModal/Margin/VBox"]
+layout_mode = 2
+focus_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_primary")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "● 先攻 (黒) で対局"
+
+[node name="BtnColorWhite" type="Button" parent="CenterContainer/VBox/ColorModal/Margin/VBox"]
+layout_mode = 2
+focus_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_primary")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "○ 後攻 (白) で対局"
+
+[node name="BtnColorBack" type="Button" parent="CenterContainer/VBox/ColorModal/Margin/VBox"]
+layout_mode = 2
+focus_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_primary")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "↶ [B] 戻る"
 
 [node name="DiffModal" type="PanelContainer" parent="CenterContainer/VBox"]
 visible = false

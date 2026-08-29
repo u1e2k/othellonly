@@ -4,14 +4,21 @@ extends Control
 signal start_game(mode: int, player_color: int, ai_diff: int, sound_on: bool, guide_on: bool)
 signal open_settings_requested
 
+# Main Menu
 @onready var main_menu_vbox: VBoxContainer = $CenterContainer/VBox/MainMenuVBox
-@onready var btn_1p_black: Button = $CenterContainer/VBox/MainMenuVBox/Btn1PBlack
-@onready var btn_1p_white: Button = $CenterContainer/VBox/MainMenuVBox/Btn1PWhite
+@onready var btn_1p: Button = $CenterContainer/VBox/MainMenuVBox/Btn1P
 @onready var btn_2p: Button = $CenterContainer/VBox/MainMenuVBox/Btn2P
 @onready var btn_watch: Button = $CenterContainer/VBox/MainMenuVBox/BtnWatch
 @onready var btn_settings: Button = $CenterContainer/VBox/MainMenuVBox/BtnSettings
 
-# Difficulty Selection Submenu
+# Color Selection Modal (Step 1 for 1P)
+@onready var color_modal: PanelContainer = $CenterContainer/VBox/ColorModal
+@onready var color_title_lbl: Label = $CenterContainer/VBox/ColorModal/Margin/VBox/ColorTitleLabel
+@onready var btn_color_black: Button = $CenterContainer/VBox/ColorModal/Margin/VBox/BtnColorBlack
+@onready var btn_color_white: Button = $CenterContainer/VBox/ColorModal/Margin/VBox/BtnColorWhite
+@onready var btn_color_back: Button = $CenterContainer/VBox/ColorModal/Margin/VBox/BtnColorBack
+
+# Difficulty Selection Modal (Step 2 for 1P / Step 1 for Watch)
 @onready var diff_modal: PanelContainer = $CenterContainer/VBox/DiffModal
 @onready var diff_title_lbl: Label = $CenterContainer/VBox/DiffModal/Margin/VBox/DiffTitleLabel
 @onready var btn_diff_easy: Button = $CenterContainer/VBox/DiffModal/Margin/VBox/BtnEasy
@@ -28,34 +35,41 @@ var sound_enabled: bool = true
 var guide_enabled: bool = true
 
 var _main_menu_buttons: Array[Button] = []
+var _color_menu_buttons: Array[Button] = []
 var _diff_menu_buttons: Array[Button] = []
 var _selected_idx: int = 0
 
 var _anim_rot: float = 0.0
 
 func _ready() -> void:
-	_main_menu_buttons = [btn_1p_black, btn_1p_white, btn_2p, btn_watch, btn_settings]
+	_main_menu_buttons = [btn_1p, btn_2p, btn_watch, btn_settings]
+	_color_menu_buttons = [btn_color_black, btn_color_white, btn_color_back]
 	_diff_menu_buttons = [btn_diff_easy, btn_diff_normal, btn_diff_hard, btn_diff_back]
 	
 	# Main menu button signals
-	btn_1p_black.pressed.connect(_on_1p_black_pressed)
-	btn_1p_white.pressed.connect(_on_1p_white_pressed)
+	btn_1p.pressed.connect(_on_1p_pressed)
 	btn_2p.pressed.connect(_on_2p_pressed)
 	btn_watch.pressed.connect(_on_watch_pressed)
 	btn_settings.pressed.connect(_on_settings_pressed)
+	
+	# Color modal button signals
+	btn_color_black.pressed.connect(func(): _on_color_chosen(ReversiLogic.BLACK))
+	btn_color_white.pressed.connect(func(): _on_color_chosen(ReversiLogic.WHITE))
+	btn_color_back.pressed.connect(_back_from_color_modal)
 	
 	# Difficulty modal button signals
 	btn_diff_easy.pressed.connect(func(): _choose_difficulty_and_start(AIController.DIFFICULTY_EASY))
 	btn_diff_normal.pressed.connect(func(): _choose_difficulty_and_start(AIController.DIFFICULTY_NORMAL))
 	btn_diff_hard.pressed.connect(func(): _choose_difficulty_and_start(AIController.DIFFICULTY_HARD))
-	btn_diff_back.pressed.connect(_close_diff_modal)
+	btn_diff_back.pressed.connect(_back_from_diff_modal)
 	
 	logo_disc.draw.connect(_draw_logo_disc)
 	
+	color_modal.visible = false
 	diff_modal.visible = false
 	main_menu_vbox.visible = true
 	_selected_idx = 0
-	btn_1p_black.grab_focus()
+	btn_1p.grab_focus()
 
 func _process(delta: float) -> void:
 	_anim_rot += delta * 1.5
@@ -69,9 +83,12 @@ func set_settings(diff: int, sound: bool, guide: bool) -> void:
 func focus_first_button() -> void:
 	if diff_modal.visible:
 		_focus_current_diff_button()
+	elif color_modal.visible:
+		_selected_idx = 0
+		btn_color_black.grab_focus()
 	else:
 		_selected_idx = 0
-		btn_1p_black.grab_focus()
+		btn_1p.grab_focus()
 
 func _focus_current_diff_button() -> void:
 	match current_diff:
@@ -88,49 +105,63 @@ func _focus_current_diff_button() -> void:
 			_selected_idx = 2
 			btn_diff_hard.grab_focus()
 
-func _on_1p_black_pressed() -> void:
-	pending_mode = GameController.MODE_1P_BLACK
-	pending_color = ReversiLogic.BLACK
-	_open_diff_modal("1P vs CPU (黒・先手) - 難易度を選択")
+# --- Flow Handlers ---
 
-func _on_1p_white_pressed() -> void:
-	pending_mode = GameController.MODE_1P_WHITE
-	pending_color = ReversiLogic.WHITE
-	_open_diff_modal("1P vs CPU (白・後手) - 難易度を選択")
+func _on_1p_pressed() -> void:
+	main_menu_vbox.visible = false
+	diff_modal.visible = false
+	color_modal.visible = true
+	_selected_idx = 0
+	btn_color_black.grab_focus()
+
+func _on_color_chosen(color: int) -> void:
+	pending_color = color
+	if color == ReversiLogic.BLACK:
+		pending_mode = GameController.MODE_1P_BLACK
+		diff_title_lbl.text = "1P (先攻・黒) - 難易度を選択"
+	else:
+		pending_mode = GameController.MODE_1P_WHITE
+		diff_title_lbl.text = "1P (後攻・白) - 難易度を選択"
+	
+	color_modal.visible = false
+	diff_modal.visible = true
+	_focus_current_diff_button()
 
 func _on_watch_pressed() -> void:
 	pending_mode = GameController.MODE_WATCH
 	pending_color = ReversiLogic.BLACK
-	_open_diff_modal("Watch Mode - CPU難易度を選択")
+	diff_title_lbl.text = "Watch Mode - CPU難易度を選択"
+	
+	main_menu_vbox.visible = false
+	color_modal.visible = false
+	diff_modal.visible = true
+	_focus_current_diff_button()
 
 func _on_2p_pressed() -> void:
 	start_game.emit(GameController.MODE_2P_LOCAL, ReversiLogic.BLACK, current_diff, sound_enabled, guide_enabled)
 
-func _open_diff_modal(title_text: String) -> void:
-	diff_title_lbl.text = title_text
-	main_menu_vbox.visible = false
-	diff_modal.visible = true
-	_focus_current_diff_button()
-
-func _close_diff_modal() -> void:
+func _back_from_color_modal() -> void:
+	color_modal.visible = false
 	diff_modal.visible = false
 	main_menu_vbox.visible = true
-	match pending_mode:
-		GameController.MODE_1P_BLACK:
-			_selected_idx = 0
-			btn_1p_black.grab_focus()
-		GameController.MODE_1P_WHITE:
-			_selected_idx = 1
-			btn_1p_white.grab_focus()
-		GameController.MODE_WATCH:
-			_selected_idx = 3
-			btn_watch.grab_focus()
-		_:
-			_selected_idx = 0
-			btn_1p_black.grab_focus()
+	_selected_idx = 0
+	btn_1p.grab_focus()
+
+func _back_from_diff_modal() -> void:
+	diff_modal.visible = false
+	if pending_mode == GameController.MODE_WATCH:
+		main_menu_vbox.visible = true
+		_selected_idx = 2
+		btn_watch.grab_focus()
+	else:
+		# Return to color selection step
+		color_modal.visible = true
+		_selected_idx = 0 if pending_color == ReversiLogic.BLACK else 1
+		_color_menu_buttons[_selected_idx].grab_focus()
 
 func _choose_difficulty_and_start(diff: int) -> void:
 	current_diff = diff
+	color_modal.visible = false
 	diff_modal.visible = false
 	main_menu_vbox.visible = true
 	start_game.emit(pending_mode, pending_color, current_diff, sound_enabled, guide_enabled)
@@ -146,11 +177,21 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("action_cancel") or event.is_action_pressed("btn_b"):
 		if diff_modal.visible:
 			get_viewport().set_input_as_handled()
-			_close_diff_modal()
+			_back_from_diff_modal()
+			return
+		elif color_modal.visible:
+			get_viewport().set_input_as_handled()
+			_back_from_color_modal()
 			return
 	
+	# Determine active list
+	var active_list: Array[Button] = _main_menu_buttons
+	if diff_modal.visible:
+		active_list = _diff_menu_buttons
+	elif color_modal.visible:
+		active_list = _color_menu_buttons
+	
 	# D-pad Up / Down menu navigation
-	var active_list: Array[Button] = _diff_menu_buttons if diff_modal.visible else _main_menu_buttons
 	if event.is_action_pressed("move_up") or event.is_action_pressed("ui_up"):
 		get_viewport().set_input_as_handled()
 		_selected_idx = wrapi(_selected_idx - 1, 0, active_list.size())
@@ -169,7 +210,6 @@ func _input(event: InputEvent) -> void:
 		if focused and focused is Button and is_ancestor_of(focused) and focused.is_visible_in_tree():
 			focused.emit_signal("pressed")
 		else:
-			# If no focus, activate current selected index
 			if _selected_idx >= 0 and _selected_idx < active_list.size():
 				active_list[_selected_idx].emit_signal("pressed")
 		return
