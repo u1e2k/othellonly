@@ -1,0 +1,161 @@
+[gd_scene format=3 uid="uid://cxtopbarscene"]
+
+[ext_resource type="Script" path="res://scripts/UI/TopBar.gd" id="1_topbar"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.09, 0.11, 0.15, 0.75)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.18, 0.22, 0.28, 0.7)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
+bg_color = Color(0.14, 0.18, 0.24, 0.8)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.32, 0.42, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[node name="TopBar" type="Control"]
+custom_minimum_size = Vector2(720, 68)
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 68.0
+grow_horizontal = 2
+script = ExtResource("1_topbar")
+
+[node name="HBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 8.0
+offset_right = -16.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Player1Card" type="PanelContainer" parent="HBox"]
+custom_minimum_size = Vector2(180, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="HBox" type="HBoxContainer" parent="HBox/Player1Card"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DiscIcon" type="Control" parent="HBox/Player1Card/HBox"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="VBox" type="VBoxContainer" parent="HBox/Player1Card/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="HBox/Player1Card/HBox/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "1P (黒)"
+
+[node name="ThinkingLabel" type="Label" parent="HBox/Player1Card/HBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 11
+text = "思考中..."
+
+[node name="ScoreLabel" type="Label" parent="HBox/Player1Card/HBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "02"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="CenterInfo" type="VBoxContainer" parent="HBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+alignment = 1
+
+[node name="ModeBadge" type="Label" parent="HBox/CenterInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.75, 0.85, 1)
+theme_override_font_sizes/font_size = 12
+text = "1P vs CPU"
+horizontal_alignment = 1
+
+[node name="VSLabel" type="Label" parent="HBox/CenterInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.5, 0.6, 1)
+theme_override_font_sizes/font_size = 11
+text = "VS"
+horizontal_alignment = 1
+
+[node name="Player2Card" type="PanelContainer" parent="HBox"]
+custom_minimum_size = Vector2(180, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="HBox" type="HBoxContainer" parent="HBox/Player2Card"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ScoreLabel" type="Label" parent="HBox/Player2Card/HBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "02"
+vertical_alignment = 1
+
+[node name="VBox" type="VBoxContainer" parent="HBox/Player2Card/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="HBox/Player2Card/HBox/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "CPU (白)"
+horizontal_alignment = 2
+
+[node name="ThinkingLabel" type="Label" parent="HBox/Player2Card/HBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 11
+text = "思考中..."
+horizontal_alignment = 2
+
+[node name="DiscIcon" type="Control" parent="HBox/Player2Card/HBox"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="PauseButton" type="Button" parent="HBox"]
+custom_minimum_size = Vector2(52, 44)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+text = "⚙"

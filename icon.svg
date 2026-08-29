@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="28" fill="#0f172a" />
+  <rect x="12" y="12" width="104" height="104" rx="18" fill="#14532d" stroke="#22c55e" stroke-width="4" />
+  <!-- Star point dots -->
+  <circle cx="42" cy="42" r="3" fill="#052e16" />
+  <circle cx="86" cy="42" r="3" fill="#052e16" />
+  <circle cx="42" cy="86" r="3" fill="#052e16" />
+  <circle cx="86" cy="86" r="3" fill="#052e16" />
+  <!-- Center Reversi Discs -->
+  <!-- Black piece (top-right & bottom-left) -->
+  <circle cx="78" cy="50" r="14" fill="#090d16" stroke="#334155" stroke-width="2" />
+  <circle cx="74" cy="46" r="5" fill="#475569" opacity="0.6" />
+  <circle cx="50" cy="78" r="14" fill="#090d16" stroke="#334155" stroke-width="2" />
+  <circle cx="46" cy="74" r="5" fill="#475569" opacity="0.6" />
+  <!-- White piece (top-left & bottom-right) -->
+  <circle cx="50" cy="50" r="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+  <circle cx="46" cy="46" r="5" fill="#ffffff" opacity="0.9" />
+  <circle cx="78" cy="78" r="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+  <circle cx="74" cy="74" r="5" fill="#ffffff" opacity="0.9" />
+</svg>

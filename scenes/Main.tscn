@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://cxmainscene"]
+
+[ext_resource type="Script" path="res://scripts/GameController.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/SoundManager.gd" id="2_sound"]
+[ext_resource type="PackedScene" path="res://scenes/TopBar.tscn" id="3_topbar"]
+[ext_resource type="PackedScene" path="res://scenes/BoardView.tscn" id="4_board"]
+[ext_resource type="PackedScene" path="res://scenes/BottomBar.tscn" id="5_bottombar"]
+[ext_resource type="PackedScene" path="res://scenes/TitleScreen.tscn" id="6_title"]
+[ext_resource type="PackedScene" path="res://scenes/Toast.tscn" id="7_toast"]
+[ext_resource type="PackedScene" path="res://scenes/PauseDialog.tscn" id="8_pause"]
+[ext_resource type="PackedScene" path="res://scenes/GameOverDialog.tscn" id="9_gameover"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.06, 0.08, 0.11, 1)
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="SoundManager" type="Node" parent="."]
+script = ExtResource("2_sound")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="GameContainer" type="VBoxContainer" parent="CanvasLayer"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="TopBar" parent="CanvasLayer/GameContainer" instance=ExtResource("3_topbar")]
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/GameContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BoardView" parent="CanvasLayer/GameContainer/CenterContainer" instance=ExtResource("4_board")]
+layout_mode = 2
+
+[node name="BottomBar" parent="CanvasLayer/GameContainer" instance=ExtResource("5_bottombar")]
+layout_mode = 2
+
+[node name="TitleScreen" parent="CanvasLayer" instance=ExtResource("6_title")]
+
+[node name="Toast" parent="CanvasLayer" instance=ExtResource("7_toast")]
+offset_top = -180.0
+offset_bottom = -120.0
+
+[node name="PauseDialog" parent="CanvasLayer" instance=ExtResource("8_pause")]
+visible = false
+
+[node name="GameOverDialog" parent="CanvasLayer" instance=ExtResource("9_gameover")]
+visible = false

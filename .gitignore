@@ -8,10 +8,22 @@ export.cfg
 export_credentials.cfg
 *.tmp
 
+# Export / Builds
+builds/
+*.apk
+*.aab
+*.pck
+*.zip
+
+# Android builds
+android/
+.gradle/
+local.properties
+
 # Imported translations (automatically generated from CSV files)
 *.translation
 
-# Mono-specific ignores
+# Mono / C# specific ignores
 .mono/
 data_*/
 mono_crash.*.json
