@@ -94,7 +94,7 @@ theme_override_constants/separation = 10
 [node name="BtnPlace" type="Button" parent="HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-focus_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
@@ -105,7 +105,7 @@ text = "[A] 打つ"
 [node name="BtnUndo" type="Button" parent="HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-focus_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
@@ -116,7 +116,7 @@ text = "[B] ↶ 戻す"
 [node name="BtnGuide" type="Button" parent="HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-focus_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
@@ -127,7 +127,7 @@ text = "[X] 💡 ガイド: ON"
 [node name="BtnMenu" type="Button" parent="HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-focus_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")

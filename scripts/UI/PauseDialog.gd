@@ -106,9 +106,17 @@ func _on_guide_toggled(pressed: bool) -> void:
 	guide_enabled = pressed
 	settings_changed.emit(sound_btn.button_pressed, guide_enabled)
 
-func _unhandled_input(event: InputEvent) -> void:
-	if not visible:
+func _input(event: InputEvent) -> void:
+	if not visible or not is_inside_tree():
 		return
 	if event.is_action_pressed("ui_pause") or event.is_action_pressed("action_cancel") or event.is_action_pressed("btn_b"):
 		get_viewport().set_input_as_handled()
 		_on_resume_pressed()
+		return
+	
+	if event.is_action_pressed("action_accept") or event.is_action_pressed("btn_a") or event.is_action_pressed("ui_accept"):
+		var focused: Control = get_viewport().gui_get_focus_owner()
+		if focused and focused is BaseButton and is_ancestor_of(focused) and focused.is_visible_in_tree():
+			get_viewport().set_input_as_handled()
+			focused.emit_signal("pressed")
+			return

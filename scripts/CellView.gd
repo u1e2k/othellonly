@@ -8,6 +8,8 @@ var current_color: int = ReversiLogic.EMPTY
 var is_guide: bool = false
 var is_last_move: bool = false
 var is_hovered: bool = false
+var is_cursor: bool = false
+var cursor_pulse: float = 0.0
 
 # Visual state for animation
 var piece_scale: Vector2 = Vector2.ONE
@@ -25,6 +27,8 @@ const COLOR_WHITE_PIECE: Color = Color(0.94, 0.96, 0.98, 1.0)    # Pearl white
 const COLOR_WHITE_RIM: Color = Color(0.75, 0.80, 0.86, 1.0)
 const COLOR_GUIDE_DOT: Color = Color(0.20, 0.90, 0.65, 0.55)     # Glowing mint
 const COLOR_LAST_MOVE: Color = Color(0.98, 0.75, 0.20, 0.90)     # Warm gold accent
+const COLOR_CURSOR: Color = Color(0.20, 0.90, 1.0, 1.0)          # Neon cyan
+const COLOR_CURSOR_GLOW: Color = Color(0.20, 0.85, 1.0, 0.40)
 
 func _ready() -> void:
 	mouse_filter = MOUSE_FILTER_PASS
@@ -32,6 +36,11 @@ func _ready() -> void:
 	gui_input.connect(_on_gui_input)
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
+
+func _process(delta: float) -> void:
+	if is_cursor:
+		cursor_pulse = wrapf(cursor_pulse + delta * 4.0, 0.0, TAU)
+		queue_redraw()
 
 func setup(pos: Vector2i) -> void:
 	grid_pos = pos
@@ -89,6 +98,11 @@ func set_last_move(active: bool) -> void:
 		is_last_move = active
 		queue_redraw()
 
+func set_cursor(active: bool) -> void:
+	if is_cursor != active:
+		is_cursor = active
+		queue_redraw()
+
 func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
@@ -125,15 +139,9 @@ func _draw() -> void:
 	# Subtle inner cell border
 	draw_rect(rect, COLOR_GRID_LINE, false, 1.0)
 	
-	# Subtle coordinate dot on board star points (3,3), (3,5), (5,3), (5,5) (1-indexed (2,2),(2,6),(6,2),(6,6))
-	if (grid_pos.x == 2 or grid_pos.x == 6) and (grid_pos.y == 2 or grid_pos.y == 6):
-		# Corner point dot
-		pass
-	
 	# 2. Guide Dot for valid move
 	if is_guide and current_color == ReversiLogic.EMPTY:
 		var guide_radius: float = radius * 0.32
-		# Soft glowing halo
 		draw_circle(center, guide_radius * 1.4, Color(COLOR_GUIDE_DOT.r, COLOR_GUIDE_DOT.g, COLOR_GUIDE_DOT.b, 0.2))
 		draw_circle(center, guide_radius, COLOR_GUIDE_DOT)
 		draw_arc(center, guide_radius, 0, TAU, 24, Color(1, 1, 1, 0.6), 1.5, true)
@@ -147,7 +155,6 @@ func _draw() -> void:
 		# Drop shadow
 		if piece_scale.x > 0.05:
 			var shadow_offset := Vector2(2.0, 3.0 - piece_elevation * 0.5)
-			var shadow_rect := Rect2(piece_center + shadow_offset - Vector2(rad_x, rad_y), Vector2(rad_x * 2.0, rad_y * 2.0))
 			draw_set_transform(piece_center + shadow_offset, 0.0, piece_scale)
 			draw_circle(Vector2.ZERO, radius, Color(0, 0, 0, 0.35))
 			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
@@ -178,3 +185,33 @@ func _draw() -> void:
 				draw_circle(Vector2.ZERO, radius * 0.10, Color(1, 1, 1, 0.9))
 			
 			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	
+	# 4. Controller Selection Cursor on Top of Stone
+	if is_cursor:
+		var pulse_sin: float = (sin(cursor_pulse) + 1.0) * 0.5
+		var pad: float = 2.0 - pulse_sin * 1.5
+		var c_rect := rect.grow(-pad)
+		
+		# Glowing border
+		draw_rect(c_rect, COLOR_CURSOR_GLOW, false, 3.0)
+		
+		# Four corner brackets
+		var corner_len: float = size.x * 0.32
+		var b_w: float = 3.5
+		var col := COLOR_CURSOR
+		
+		# TL
+		draw_line(c_rect.position, c_rect.position + Vector2(corner_len, 0), col, b_w)
+		draw_line(c_rect.position, c_rect.position + Vector2(0, corner_len), col, b_w)
+		# TR
+		var tr := c_rect.position + Vector2(c_rect.size.x, 0)
+		draw_line(tr, tr + Vector2(-corner_len, 0), col, b_w)
+		draw_line(tr, tr + Vector2(0, corner_len), col, b_w)
+		# BL
+		var bl := c_rect.position + Vector2(0, c_rect.size.y)
+		draw_line(bl, bl + Vector2(corner_len, 0), col, b_w)
+		draw_line(bl, bl + Vector2(0, -corner_len), col, b_w)
+		# BR
+		var br := c_rect.position + c_rect.size
+		draw_line(br, br + Vector2(-corner_len, 0), col, b_w)
+		draw_line(br, br + Vector2(0, -corner_len), col, b_w)

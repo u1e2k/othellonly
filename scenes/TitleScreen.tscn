@@ -5,6 +5,21 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.06, 0.08, 0.11, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_modal"]
+bg_color = Color(0.09, 0.12, 0.17, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.45, 0.65, 0.9)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 16
+shadow_offset = Vector2(0, 6)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_primary"]
 bg_color = Color(0.14, 0.22, 0.32, 0.9)
 border_width_left = 1
@@ -22,7 +37,7 @@ content_margin_right = 16.0
 content_margin_bottom = 10.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
-bg_color = Color(0.20, 0.32, 0.48, 0.95)
+bg_color = Color(0.22, 0.36, 0.52, 0.98)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -69,6 +84,38 @@ content_margin_top = 10.0
 content_margin_right = 16.0
 content_margin_bottom = 10.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hard"]
+bg_color = Color(0.32, 0.14, 0.18, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 2
+border_color = Color(0.90, 0.40, 0.45, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal_diff"]
+bg_color = Color(0.32, 0.26, 0.12, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 2
+border_color = Color(0.90, 0.75, 0.30, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+
 [node name="TitleScreen" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -98,7 +145,7 @@ grow_vertical = 2
 [node name="VBox" type="VBoxContainer" parent="CenterContainer"]
 custom_minimum_size = Vector2(480, 0)
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 14
 alignment = 1
 
 [node name="LogoContainer" type="HBoxContainer" parent="CenterContainer/VBox"]
@@ -130,11 +177,11 @@ text = "Modern Reversi for RG Rotate"
 [node name="HSeparator" type="HSeparator" parent="CenterContainer/VBox"]
 layout_mode = 2
 
-[node name="MenuVBox" type="VBoxContainer" parent="CenterContainer/VBox"]
+[node name="MainMenuVBox" type="VBoxContainer" parent="CenterContainer/VBox"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Btn1PBlack" type="Button" parent="CenterContainer/VBox/MenuVBox"]
+[node name="Btn1PBlack" type="Button" parent="CenterContainer/VBox/MainMenuVBox"]
 layout_mode = 2
 focus_mode = 2
 theme_override_font_sizes/font_size = 15
@@ -143,7 +190,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "● 1P vs CPU (黒・先手で対局)"
 
-[node name="Btn1PWhite" type="Button" parent="CenterContainer/VBox/MenuVBox"]
+[node name="Btn1PWhite" type="Button" parent="CenterContainer/VBox/MainMenuVBox"]
 layout_mode = 2
 focus_mode = 2
 theme_override_font_sizes/font_size = 15
@@ -152,7 +199,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "○ 1P vs CPU (白・後手で対局)"
 
-[node name="Btn2P" type="Button" parent="CenterContainer/VBox/MenuVBox"]
+[node name="Btn2P" type="Button" parent="CenterContainer/VBox/MainMenuVBox"]
 layout_mode = 2
 focus_mode = 2
 theme_override_font_sizes/font_size = 15
@@ -161,7 +208,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "👥 2P Local (二人で対戦)"
 
-[node name="BtnWatch" type="Button" parent="CenterContainer/VBox/MenuVBox"]
+[node name="BtnWatch" type="Button" parent="CenterContainer/VBox/MainMenuVBox"]
 layout_mode = 2
 focus_mode = 2
 theme_override_font_sizes/font_size = 15
@@ -170,21 +217,76 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "👁 Watch Mode (CPU対戦観戦)"
 
-[node name="DiffLabel" type="Label" parent="CenterContainer/VBox/MenuVBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.75, 0.85, 1)
-theme_override_font_sizes/font_size = 12
-text = "CPU難易度: 上級 (HARD)"
-horizontal_alignment = 1
-
-[node name="BtnSettings" type="Button" parent="CenterContainer/VBox/MenuVBox"]
+[node name="BtnSettings" type="Button" parent="CenterContainer/VBox/MainMenuVBox"]
 layout_mode = 2
 focus_mode = 2
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_primary")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-text = "⚙ 設定 (難易度・効果音・ガイド)"
+text = "⚙ 設定 (効果音・ガイド)"
+
+[node name="DiffModal" type="PanelContainer" parent="CenterContainer/VBox"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel_modal")
+
+[node name="Margin" type="MarginContainer" parent="CenterContainer/VBox/DiffModal"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/VBox/DiffModal/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DiffTitleLabel" type="Label" parent="CenterContainer/VBox/DiffModal/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "難易度を選択してください"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/VBox/DiffModal/Margin/VBox"]
+layout_mode = 2
+
+[node name="BtnEasy" type="Button" parent="CenterContainer/VBox/DiffModal/Margin/VBox"]
+layout_mode = 2
+focus_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_accent")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "🟢 初級 (EASY) - ランダム着手"
+
+[node name="BtnNormal" type="Button" parent="CenterContainer/VBox/DiffModal/Margin/VBox"]
+layout_mode = 2
+focus_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal_diff")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "🟡 中級 (NORMAL) - 挟める枚数重視"
+
+[node name="BtnHard" type="Button" parent="CenterContainer/VBox/DiffModal/Margin/VBox"]
+layout_mode = 2
+focus_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_hard")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "🔴 上級 (HARD) - 本格AI (角・辺・開放度)"
+
+[node name="BtnBack" type="Button" parent="CenterContainer/VBox/DiffModal/Margin/VBox"]
+layout_mode = 2
+focus_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_primary")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "↶ [B] 戻る"
 
 [node name="FooterLabel" type="Label" parent="CenterContainer/VBox"]
 layout_mode = 2

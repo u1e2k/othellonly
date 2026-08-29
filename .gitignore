@@ -4,9 +4,13 @@
 
 # Godot-specific ignores
 .import/
+*.import
 export.cfg
 export_credentials.cfg
 *.tmp
+*.screen.png
+*.capture.png
+scratch/
 
 # Export / Builds
 builds/

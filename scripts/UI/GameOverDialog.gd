@@ -85,16 +85,16 @@ func _draw_p2_disc() -> void:
 	p2_disc.draw_circle(center, r * 0.9, Color(0.95, 0.96, 0.98, 1.0))
 	p2_disc.draw_circle(center + Vector2(-r * 0.25, -r * 0.25), r * 0.35, Color(1.0, 1.0, 1.0, 0.8))
 
-func _unhandled_input(event: InputEvent) -> void:
-	if not visible:
+func _input(event: InputEvent) -> void:
+	if not visible or not is_inside_tree():
 		return
-	if event.is_action_pressed("action_accept") or event.is_action_pressed("btn_a"):
+	if event.is_action_pressed("action_accept") or event.is_action_pressed("btn_a") or event.is_action_pressed("ui_accept"):
 		get_viewport().set_input_as_handled()
 		rematch_requested.emit()
 	elif event.is_action_pressed("action_x") or event.is_action_pressed("btn_x"):
 		get_viewport().set_input_as_handled()
 		settings_requested.emit()
-	elif event.is_action_pressed("action_cancel") or event.is_action_pressed("btn_b"):
+	elif event.is_action_pressed("action_cancel") or event.is_action_pressed("btn_b") or event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		close()
 		closed.emit()

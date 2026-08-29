@@ -39,8 +39,8 @@ var guide_enabled: bool = true
 var sound_enabled: bool = true
 var last_move_pos: Vector2i = Vector2i(-1, -1)
 
-var _input_cooldown: float = 0.0
-const INPUT_DELAY: float = 0.16
+var _stick_cooldown: float = 0.0
+const STICK_REPEAT_DELAY: float = 0.22
 
 func _ready() -> void:
 	board_view.set_sound_manager(sound_manager)
@@ -69,13 +69,31 @@ func _ready() -> void:
 	_show_title_screen()
 
 func _process(delta: float) -> void:
-	if _input_cooldown > 0.0:
-		_input_cooldown -= delta
-
-func _unhandled_input(event: InputEvent) -> void:
-	if state == State.TITLE or state == State.PAUSED or pause_dialog.visible or game_over_dialog.visible:
+	if state != State.WAITING_INPUT or not _is_human_turn():
 		return
 	
+	# Analog stick continuous navigation
+	if _stick_cooldown > 0.0:
+		_stick_cooldown -= delta
+	else:
+		var stick_vec: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+		if stick_vec.length() > 0.5:
+			var dir := Vector2i.ZERO
+			if absf(stick_vec.x) > absf(stick_vec.y):
+				dir.x = 1 if stick_vec.x > 0 else -1
+			else:
+				dir.y = 1 if stick_vec.y > 0 else -1
+			
+			if dir != Vector2i.ZERO:
+				board_view.move_cursor(dir)
+				sound_manager.play_click()
+				_stick_cooldown = STICK_REPEAT_DELAY
+
+func _input(event: InputEvent) -> void:
+	if not is_inside_tree() or state == State.TITLE or state == State.PAUSED or pause_dialog.visible or game_over_dialog.visible:
+		return
+	
+	# 1. System actions
 	if event.is_action_pressed("ui_pause") or event.is_action_pressed("btn_start"):
 		get_viewport().set_input_as_handled()
 		_open_pause_menu()
@@ -86,32 +104,34 @@ func _unhandled_input(event: InputEvent) -> void:
 		_on_guide_toggled()
 		return
 	
-	if event.is_action_pressed("action_cancel") or event.is_action_pressed("btn_b"):
+	if event.is_action_pressed("action_cancel") or event.is_action_pressed("btn_b") or event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_on_undo_pressed()
 		return
 	
-	if _input_cooldown <= 0.0:
-		var dir := Vector2i.ZERO
-		if Input.is_action_pressed("move_left"):
-			dir.x -= 1
-		elif Input.is_action_pressed("move_right"):
-			dir.x += 1
-		if Input.is_action_pressed("move_up"):
-			dir.y -= 1
-		elif Input.is_action_pressed("move_down"):
-			dir.y += 1
-		
-		if dir != Vector2i.ZERO:
-			board_view.move_cursor(dir)
-			_input_cooldown = INPUT_DELAY
-			sound_manager.play_click()
-			return
+	# 2. Board D-pad cursor movement (Discrete button presses for instant response)
+	var move_dir := Vector2i.ZERO
+	if event.is_action_pressed("move_left") or event.is_action_pressed("ui_left"):
+		move_dir.x -= 1
+	elif event.is_action_pressed("move_right") or event.is_action_pressed("ui_right"):
+		move_dir.x += 1
+	elif event.is_action_pressed("move_up") or event.is_action_pressed("ui_up"):
+		move_dir.y -= 1
+	elif event.is_action_pressed("move_down") or event.is_action_pressed("ui_down"):
+		move_dir.y += 1
 	
-	if event.is_action_pressed("action_accept") or event.is_action_pressed("btn_a"):
+	if move_dir != Vector2i.ZERO:
+		get_viewport().set_input_as_handled()
+		board_view.move_cursor(move_dir)
+		sound_manager.play_click()
+		return
+	
+	# 3. Main Action A button (Place piece)
+	if event.is_action_pressed("action_accept") or event.is_action_pressed("btn_a") or event.is_action_pressed("ui_accept"):
 		if state == State.WAITING_INPUT and _is_human_turn():
 			get_viewport().set_input_as_handled()
 			_on_place_pressed()
+			return
 
 func _show_title_screen() -> void:
 	state = State.TITLE
@@ -145,7 +165,10 @@ func _start_new_game() -> void:
 	
 	_update_header_mode()
 	_update_views()
-	board_view.set_cursor_pos(Vector2i(3, 2))
+	
+	# Initial cursor placement on an active valid move (2, 3)
+	board_view.set_cursor_pos(Vector2i(2, 3))
+	board_view.set_cursor_visible(true)
 	
 	state = State.CHECK_TRANSITION
 	_advance_turn()
@@ -227,6 +250,7 @@ func _advance_turn() -> void:
 	
 	if _is_human_turn():
 		state = State.WAITING_INPUT
+		board_view.set_cursor_visible(true)
 		_update_views()
 	else:
 		state = State.CPU_THINKING
